@@ -19,6 +19,7 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)  
 
+
 require('lazy').setup({
 
 	-- NOTE: This is where your plugins related to LSP can be installed.
@@ -48,6 +49,8 @@ require('lazy').setup({
 			'hrsh7th/cmp-buffer',
 			'hrsh7th/cmp-path',
 			'hrsh7th/cmp-cmdline',
+                        'hrsh7th/cmp-copilot',
+                        'hrsh7th/cmp-vsnip',
 		}
 	},
 	{
@@ -67,7 +70,46 @@ require('lazy').setup({
 			"MunifTanjim/nui.nvim",
 		}
 	},
-	'github/copilot.vim'
+	'github/copilot.vim',
+        {
+            'nvim-telescope/telescope.nvim',
+            requires = {{'nvim-lua/plenary.nvim'}}
+        },
+        {
+            "nvim-treesitter/nvim-treesitter",
+            run = ":TSUpdate",
+            highlight = {
+                enable = true,
+                disable = {},
+            },
+            ensure_installed = {
+                "bash",
+                "c",
+                "cpp",
+                "css",
+                "dockerfile",
+                "go",
+                "gomod",
+                "html",
+                "java",
+                "javascript",
+                "json",
+                "jsonc",
+                "lua",
+                "python",
+                "pug",
+                "regex",
+                "rust",
+                "toml",
+                "typescript",
+                "yaml",
+            },
+        },
+        {
+            "numToStr/Comment.nvim",
+            opts = {},
+            lazy = false
+        }
 })
 
 -- Set highlight on search
@@ -83,6 +125,8 @@ vim.o.mouse = 'a'
 -- Case-insensitive searching UNLESS \C or capital in search
 vim.o.ignorecase = true
 vim.o.smartcase = true
+
+vim.g.mapleader = ' '
 
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
@@ -104,7 +148,7 @@ vim.api.nvim_set_keymap('n', '<C-Up>', '<C-W><C-K>', { noremap = true })
 vim.api.nvim_set_keymap('n', '<C-Down>', '<C-W><C-J>', { noremap = true })
 vim.api.nvim_set_keymap('n', '<C-Left>', '<C-W><C-H>', { noremap = true })
 vim.api.nvim_set_keymap('n', '<C-Right>', '<C-W><C-L>', { noremap = true })
-vim.api.nvim_set_keymap('n', '<C-v>', '<C-r>+', { noremap = true })
+-- vim.api.nvim_set_keymap('n', '<C-v>', '<C-r>+', { noremap = true })
 
 vim.cmd([[nnoremap \ :Neotree reveal<cr>]])
 
@@ -117,8 +161,8 @@ cmp.setup {
     end,
   },
   mapping = {
-    ['<C-p>'] = cmp.mapping.select_prev_item(),
-    ['<C-n>'] = cmp.mapping.select_next_item(),
+    ['<Up>'] = cmp.mapping.select_prev_item(),
+    ['<Down>'] = cmp.mapping.select_next_item(),
     ['<C-d>'] = cmp.mapping.scroll_docs(-4),
     ['<C-f>'] = cmp.mapping.scroll_docs(4),
     ['<C-Space>'] = cmp.mapping.complete(),
@@ -135,4 +179,30 @@ cmp.setup {
     { name = 'cmdline' },
     { name = 'copilot' },
   },
+  completion = {
+    completeopt = 'menu,menuone,noinsert',
+    autocomplete = false,
+  },
 }
+local lspconfig = require('lspconfig')
+local lsp_defaults = lspconfig.util.default_config
+
+lsp_defaults.capabilities = vim.tbl_deep_extend(
+  'force',
+  lsp_defaults.capabilities,
+  require('cmp_nvim_lsp').default_capabilities()
+)
+lspconfig.jdtls.setup({})
+lspconfig.rust_analyzer.setup({})
+lspconfig.ruff_lsp.setup({})
+
+-- Enable spell check automatically for text files
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = { "html", "markdown", "text" },
+    callback = function()
+        vim.opt_local.spell = true
+    end,
+}) 
+
+-- Copilot for markdown
+vim.g.copilot_filetypes = {markdown = true}
