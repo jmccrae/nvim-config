@@ -109,7 +109,8 @@ require('lazy').setup({
             "numToStr/Comment.nvim",
             opts = {},
             lazy = false
-        }
+        },
+        'kaarmu/typst.vim'
 })
 
 -- Set highlight on search
