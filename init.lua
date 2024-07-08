@@ -110,7 +110,8 @@ require('lazy').setup({
             opts = {},
             lazy = false
         },
-        'kaarmu/typst.vim'
+        'kaarmu/typst.vim',
+        'digitaltoad/vim-pug'
 })
 
 -- Set highlight on search
