@@ -111,7 +111,8 @@ require('lazy').setup({
             lazy = false
         },
         'kaarmu/typst.vim',
-        'digitaltoad/vim-pug'
+        'digitaltoad/vim-pug',
+        'exosite/lua-yaml'
 })
 
 -- Set highlight on search
@@ -152,7 +153,8 @@ vim.api.nvim_set_keymap('n', '<C-Left>', '<C-W><C-H>', { noremap = true })
 vim.api.nvim_set_keymap('n', '<C-Right>', '<C-W><C-L>', { noremap = true })
 -- vim.api.nvim_set_keymap('n', '<C-v>', '<C-r>+', { noremap = true })
 
-vim.cmd([[nnoremap \ :Neotree reveal<cr>]])
+--vim.cmd([[nnoremap <Leader>t :Neotree reveal<cr>]])
+vim.api.nvim_set_keymap('n', '<Leader>t', ':Neotree reveal<cr>', { noremap = true })
 
 local cmp = require 'cmp'
 
@@ -195,7 +197,15 @@ lsp_defaults.capabilities = vim.tbl_deep_extend(
   require('cmp_nvim_lsp').default_capabilities()
 )
 lspconfig.jdtls.setup({})
-lspconfig.rust_analyzer.setup({})
+lspconfig.rust_analyzer.setup({
+    settings = {
+        ["rust-analyzer"] = {
+            diagnostics = {
+                disabled = {"unresolved-proc-macro"}
+            }
+        }
+    }
+})
 lspconfig.ruff_lsp.setup({})
 
 -- Enable spell check automatically for text files
@@ -208,3 +218,11 @@ vim.api.nvim_create_autocmd("FileType", {
 
 -- Copilot for markdown
 vim.g.copilot_filetypes = {markdown = true}
+
+vim.cmd([[
+  augroup FileTypePug
+    autocmd!
+    autocmd FileType pug setlocal tabstop=2 shiftwidth=2 softtabstop=2
+  augroup END
+]])
+
